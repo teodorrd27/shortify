@@ -1,7 +1,7 @@
 import { test } from 'tap'
 import { buildFastify} from '../src/app'
 
-test('GET /health endpoint returns 200 and ok status', async (t) => {
+test('GET /health endpoint returns 200 and ok status in JSON format', async (t) => {
   t.teardown(() => app.close())
   t.plan(2)
   const app = buildFastify()
@@ -15,5 +15,5 @@ test('GET /health endpoint returns 200 and ok status', async (t) => {
   if (!res) return
 
   t.equal(res?.statusCode, 200)
-  t.same(JSON.parse(res?.body || ''), { status: 'ok'})
+  t.equal(res?.body, JSON.stringify({ status: 'ok'}))
 })
