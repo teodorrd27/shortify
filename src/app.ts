@@ -1,7 +1,7 @@
 import Fastify from 'fastify'
 import { validatorCompiler, ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
-import isURL from 'validator/lib/isURL'
+import validator from 'validator'
 
 const buildFastify = () => {
   const fastify = Fastify({
@@ -38,7 +38,7 @@ const buildFastify = () => {
       url: z.string({
         required_error: '\'url\' query is required. Example: http://localhost:3000/encode?url=https://example.com',
       }).refine((url) => {
-        return isURL(url, { protocols: ['https'], allow_query_components: false })
+        return validator.isURL(url, { protocols: ['https'], allow_query_components: false })
       }, {
         message: 'Invalid URL. Hint: Make sure to use the HTTPS protocol. For URLs with query parameters, use POST endpoint instead',
       }),
