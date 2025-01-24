@@ -1,0 +1,23 @@
+{
+  "name": "shortify",
+  "version": "1.0.0",
+  "description": "URL shortening service",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "npx tap --node-arg=--import=tsx",
+    "dev": "npx nodemon src/server.ts --exec tsx"
+  },
+  "author": "Iuliu Teodor Radu",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.10.9",
+    "nodemon": "^3.1.9",
+    "tap": "^21.0.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "fastify": "^5.2.1"
+  }
+}
