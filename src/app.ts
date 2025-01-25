@@ -2,6 +2,7 @@ import Fastify from 'fastify'
 import { validatorCompiler, ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import validator from 'validator'
+import { StorageManager } from './storage.manager'
 
 const buildFastify = () => {
   const fastify = Fastify({
