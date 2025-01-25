@@ -3,8 +3,7 @@ interface ShortenedURLEntry {
   shortParam: string
   createdAt: Date
   expiresAt: Date
+  clicks: number
 }
 
-type LooseISODateString = `${string}T${string}Z`
-
-export { ShortenedURLEntry, LooseISODateString }
+export { ShortenedURLEntry }
