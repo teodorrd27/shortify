@@ -36,7 +36,7 @@ const buildFastify = () => {
   fastify.withTypeProvider<ZodTypeProvider>().get('/encode', { schema: {
     querystring: z.strictObject({
       url: z.string({
-        required_error: '\'url\' query is required. Example: http://localhost:3000/encode?url=https://example.com',
+        required_error: `'url' query is required. Example: ${process.env.DOMAIN}/encode?url=https://example.com`,
       }).refine((url) => {
         return validator.isURL(url, { protocols: ['https'], allow_query_components: false })
       }, {
