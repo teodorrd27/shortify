@@ -14,11 +14,12 @@ class StorageManager {
   ) {}
 
   // Ensure a single instance of StorageManager
-  static get instance(): StorageManager {
+  // SECURITY: prevent modification of the instance
+  static get instance() {
     if (StorageManager._instance === null) {
       StorageManager._instance = new StorageManager()
     }
-    return StorageManager._instance
+    return Object.freeze(StorageManager._instance)
   }
   
   // SECURITY: in case of astronomically improbable collision, have a robust way to prevent sequential guesses
