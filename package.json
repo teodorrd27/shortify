@@ -19,11 +19,13 @@
     "typescript": "^5.7.3"
   },
   "dependencies": {
+    "@fastify/schedule": "^6.0.0",
     "base-x": "^5.0.0",
     "dayjs": "^1.11.13",
     "dotenv": "^16.4.7",
     "fastify": "^5.2.1",
     "fastify-type-provider-zod": "^4.0.2",
+    "toad-scheduler": "^3.0.1",
     "validator": "^13.12.0",
     "zod": "^3.24.1"
   }

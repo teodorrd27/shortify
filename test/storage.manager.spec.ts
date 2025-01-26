@@ -9,7 +9,7 @@ test('StorageManager instance is read-only', async (t) => {
     storageManager.storage = new Map()
   })
   t.throws(() => {
-    storageManager.orderedExpiryIndex = []
+    storageManager.descOrderedExpiryIndex = []
   })
 })
 
@@ -23,8 +23,8 @@ test('StorageManager underlying storage is modifiable', async (t) => {
   t.equal(storageManager.storage.size, 1)
 
   const newDate = new Date().toISOString()
-  storageManager.orderedExpiryIndex.push(newDate)
-  t.equal(storageManager.orderedExpiryIndex[0], newDate)
+  storageManager.descOrderedExpiryIndex.push(newDate)
+  t.equal(storageManager.descOrderedExpiryIndex[0], newDate)
 })
 
 test('BuildShortURL returns a valid short URL', async (t) => {

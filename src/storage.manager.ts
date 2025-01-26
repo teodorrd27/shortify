@@ -9,7 +9,7 @@ class StorageManager {
   
   private constructor(
     public storage = new Map<string, ShortenedURLEntry>(),
-    public orderedExpiryIndex: string[] = []
+    public descOrderedExpiryIndex: string[] = []
   ) {}
 
   // SECURITY: Return a non modifiable shallow read-only instance of StorageManager
