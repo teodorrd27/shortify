@@ -2,26 +2,26 @@ import { env } from './env'
 import { ShortenedURLEntry } from './types/storage.type'
 import { createHash } from 'crypto'
 import baseX from 'base-x'
+import dayjs from 'dayjs'
 
 class StorageManager {
   private static _instance: StorageManager | null = null
   private static readonly URLfriendlyEncoding = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  private storage = new Map<string, ShortenedURLEntry>()
+  private descOrderedExpiryIndex: string[] = []
   
-  private constructor(
-    public storage = new Map<string, ShortenedURLEntry>(),
-    public descOrderedExpiryIndex: string[] = []
-  ) {}
+  private constructor() {}
 
-  // SECURITY: Return a non modifiable shallow read-only instance of StorageManager
-  public static get instance(): StorageManager {
+  // Ensure a single instance of StorageManager
+  static get instance(): StorageManager {
     if (StorageManager._instance === null) {
       StorageManager._instance = new StorageManager()
     }
-    return Object.freeze(StorageManager._instance)
+    return StorageManager._instance
   }
   
   // SECURITY: in case of astronomically improbable collision, have a robust way to prevent sequential guesses
-  public hash(longURL: string, time: string) {
+  hash(longURL: string, time: string) {
     for (let salt = 0; salt < 10; salt++) {
       const input = `${salt}::${time}::${longURL}`
       const binHash = createHash('sha256').update(input).digest()
@@ -36,13 +36,33 @@ class StorageManager {
     throw new Error('Failed to generate a unique hash')
   }
 
-  public buildShortURL(shortParam: string) {
+  insert(safeShortenedURLEntry: ShortenedURLEntry) {
+    const safeParam = safeShortenedURLEntry.shortParam
+    this.storage.set(safeParam, safeShortenedURLEntry)
+    this.descOrderedExpiryIndex.push(safeShortenedURLEntry.expiresAt.toISOString())
+    this.descOrderedExpiryIndex.sort((a, b) => dayjs(b).diff(dayjs(a)))
+  }
+
+  read(shortParam: string): Readonly<ShortenedURLEntry> | undefined {
+    return this.storage.get(shortParam)
+  }
+
+  incrementClicks(shortParam: string) {
+    const entry = this.storage.get(shortParam)
+    if (entry) entry.clicks++
+  }
+
+  buildShortURL(shortParam: string) {
     return `${env.PROTOCOL}://${env.DOMAIN}/${shortParam}`
   }
 
-  public extractShortParam(url: string) {
+  extractShortParam(url: string) {
     const urlObj = new URL(url)
     return urlObj.pathname.slice(1)
+  }
+
+  get size() {
+    return this.storage.size
   }
 }
 

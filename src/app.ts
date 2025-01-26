@@ -7,18 +7,9 @@ import dayjs from 'dayjs'
 import { env } from './env'
 
 import { fastifySchedule } from '@fastify/schedule'
-import { SimpleIntervalJob, AsyncTask } from 'toad-scheduler'
-import { ShortenedURLEntry } from './types/storage.type'
 
-const cleanupExpiredURLsTask = new AsyncTask('clean up expired URLs', async () => {
-  const now = dayjs()
-  let descOrderedExpiryIndex = StorageManager.instance.descOrderedExpiryIndex
-  while (descOrderedExpiryIndex.length > 0 && now.isAfter(dayjs(descOrderedExpiryIndex[descOrderedExpiryIndex.length - 1]))) {
-    const expiredEntry = descOrderedExpiryIndex.pop()!
-    StorageManager.instance.storage.delete(expiredEntry)
-  }
-})
-const cleanupExpiredURLsJob = new SimpleIntervalJob({ seconds: 1 }, cleanupExpiredURLsTask)
+import { ShortenedURLEntry } from './types/storage.type'
+import { cleanupExpiredURLsJob } from './jobs/cleanupExpiredURLs.job'
 
 const buildFastify = () => {
   const fastify = Fastify({
@@ -92,9 +83,7 @@ const buildFastify = () => {
       shortParam: safeParam,
       clicks: 0,
     }
-    StorageManager.instance.storage.set(safeParam, shortenedURLEntry)
-    StorageManager.instance.descOrderedExpiryIndex.push(shortenedURLEntry.expiresAt.toISOString())
-    StorageManager.instance.descOrderedExpiryIndex.sort((a, b) => dayjs(b).diff(dayjs(a)))
+    StorageManager.instance.insert(shortenedURLEntry)
 
     return { shortURL: StorageManager.instance.buildShortURL(safeParam) }
   })
@@ -133,9 +122,7 @@ const buildFastify = () => {
       shortParam: safeParam,
       clicks: 0,
     }
-    StorageManager.instance.storage.set(safeParam, shortenedURLEntry)
-    StorageManager.instance.descOrderedExpiryIndex.push(shortenedURLEntry.expiresAt.toISOString())
-    StorageManager.instance.descOrderedExpiryIndex.sort((a, b) => dayjs(b).diff(dayjs(a)))
+    StorageManager.instance.insert(shortenedURLEntry)
 
     return { shortURL: StorageManager.instance.buildShortURL(safeParam) }
   })
@@ -164,7 +151,7 @@ const buildFastify = () => {
   } }, (req, res) => {
     const { url } = req.query
     const shortParam = StorageManager.instance.extractShortParam(url)
-    const entry = StorageManager.instance.storage.get(shortParam)
+    const entry = StorageManager.instance.read(shortParam)
 
     if (!entry) {
       res.status(404)
@@ -184,16 +171,16 @@ const buildFastify = () => {
       message: `Your URL code must contain exactly 8 characters. Example: ${process.env.DOMAIN}/HPxdBt3e`,
     }),
     response: {
+      302: z.void(),
       404: z.object({
         statusCode: z.number(),
         error: z.string(),
         message: z.string(),
       }),
-      302: z.void(),
     }
   } }, (req, res) => {
     const { shortParam } = req.params
-    const entry = StorageManager.instance.storage.get(shortParam)
+    const entry = StorageManager.instance.read(shortParam)
     if (!entry) {
       res.status(404)
       return {
@@ -202,7 +189,7 @@ const buildFastify = () => {
         message: 'Long URL not found',
       }
     }
-    entry.clicks++
+    StorageManager.instance.incrementClicks(shortParam)
 
     res.status(302)
     res.redirect(entry.longURL)

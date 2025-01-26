@@ -2,29 +2,14 @@ import { test } from 'tap'
 import { StorageManager } from '../src/storage.manager'
 import { env } from '../src/env'
 
-test('StorageManager instance is read-only', async (t) => {
-  t.plan(2)
-  const storageManager = StorageManager.instance
-  t.throws(() => {
-    storageManager.storage = new Map()
-  })
-  t.throws(() => {
-    storageManager.descOrderedExpiryIndex = []
-  })
-})
-
 test('StorageManager underlying storage is modifiable', async (t) => {
-  t.plan(2)
+  t.plan(1)
   const storageManager = StorageManager.instance
-  storageManager.storage.set('test', {
+  storageManager.insert({
     longURL: 'test', shortParam: 'test', createdAt: new Date(), expiresAt: new Date(),
     clicks: 0
   })
-  t.equal(storageManager.storage.size, 1)
-
-  const newDate = new Date().toISOString()
-  storageManager.descOrderedExpiryIndex.push(newDate)
-  t.equal(storageManager.descOrderedExpiryIndex[0], newDate)
+  t.equal(storageManager.size, 1)
 })
 
 test('BuildShortURL returns a valid short URL', async (t) => {
@@ -46,7 +31,7 @@ test('Hasher returns a valid short URL', async (t) => {
 test('Hasher handles collision', async (t) => {
   t.plan(1)
   const storageManager = StorageManager.instance
-  storageManager.storage.set('ULJpBtAe', {
+  storageManager.insert({
     longURL: 'https://example.com', shortParam: 'ULJpBtAe', createdAt: new Date(), expiresAt: new Date(),
     clicks: 0
   })
