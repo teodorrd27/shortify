@@ -2,7 +2,7 @@ import Fastify from 'fastify'
 import { serializerCompiler, validatorCompiler, ZodTypeProvider } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import validator from 'validator'
-import { StorageManager } from './storage.manager'
+import { URLRepo } from './repos/url.repo'
 import dayjs from 'dayjs'
 import { env } from './env'
 
@@ -75,7 +75,7 @@ const buildFastify = () => {
   } }, (req) => {
     const { url } = req.query
     const now = dayjs()
-    const safeParam = StorageManager.instance.hash(url, now.toISOString())
+    const safeParam = URLRepo.instance.hash(url, now.toISOString())
     const shortenedURLEntry: ShortenedURLEntry = {
       createdAt: now.toDate(),
       expiresAt: now.add(env.DEFAULT_EXPIRY_DAYS, 'days').toDate(),
@@ -83,9 +83,9 @@ const buildFastify = () => {
       shortParam: safeParam,
       clicks: 0,
     }
-    StorageManager.instance.insert(shortenedURLEntry)
+    URLRepo.instance.insert(shortenedURLEntry)
 
-    return { shortURL: StorageManager.instance.buildShortURL(safeParam) }
+    return { shortURL: URLRepo.instance.buildShortURL(safeParam) }
   })
 
   fastify.withTypeProvider<ZodTypeProvider>().post('/encode', { schema: {
@@ -114,7 +114,7 @@ const buildFastify = () => {
   }}, (req) => {
     const { url, daysToExpire } = req.body
     const now = dayjs()
-    const safeParam = StorageManager.instance.hash(url, now.toISOString())
+    const safeParam = URLRepo.instance.hash(url, now.toISOString())
     const shortenedURLEntry: ShortenedURLEntry = {
       createdAt: now.toDate(),
       expiresAt: now.add(daysToExpire ?? env.DEFAULT_EXPIRY_DAYS, 'days').toDate(),
@@ -122,9 +122,9 @@ const buildFastify = () => {
       shortParam: safeParam,
       clicks: 0,
     }
-    StorageManager.instance.insert(shortenedURLEntry)
+    URLRepo.instance.insert(shortenedURLEntry)
 
-    return { shortURL: StorageManager.instance.buildShortURL(safeParam) }
+    return { shortURL: URLRepo.instance.buildShortURL(safeParam) }
   })
 
   fastify.withTypeProvider<ZodTypeProvider>().get('/decode', { schema: {
@@ -150,8 +150,8 @@ const buildFastify = () => {
     }
   } }, (req, res) => {
     const { url } = req.query
-    const shortParam = StorageManager.instance.extractShortParam(url)
-    const entry = StorageManager.instance.read(shortParam)
+    const shortParam = URLRepo.instance.extractShortParam(url)
+    const entry = URLRepo.instance.read(shortParam)
 
     if (!entry) {
       res.status(404)
@@ -180,7 +180,7 @@ const buildFastify = () => {
     }
   } }, (req, res) => {
     const { shortParam } = req.params
-    const entry = StorageManager.instance.read(shortParam)
+    const entry = URLRepo.instance.read(shortParam)
     if (!entry) {
       res.status(404)
       return {
@@ -189,7 +189,7 @@ const buildFastify = () => {
         message: 'Long URL not found',
       }
     }
-    StorageManager.instance.incrementClicks(shortParam)
+    URLRepo.instance.incrementClicks(shortParam)
 
     res.status(302)
     res.redirect(entry.longURL)

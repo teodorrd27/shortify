@@ -1,33 +1,33 @@
-import { env } from './env'
-import { ShortenedURLEntry } from './types/storage.type'
+import { env } from '../env'
+import { ShortenedURLEntry } from '../types/storage.type'
 import { createHash } from 'crypto'
 import baseX from 'base-x'
 import dayjs, { Dayjs } from 'dayjs'
 
-class StorageManager {
-  private static _instance: StorageManager | null = null
+class URLRepo {
+  private static _instance: URLRepo | null = null
   private static readonly URLfriendlyEncoding = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-  
+
   private constructor(
     private storage = new Map<string, ShortenedURLEntry>(),
     private descOrderedExpiryIndex: string[] = [],
   ) {}
 
-  // Ensure a single instance of StorageManager
+  // Ensure a single instance of URLRepo
   // SECURITY: prevent modification of the instance
   static get instance() {
-    if (StorageManager._instance === null) {
-      StorageManager._instance = new StorageManager()
+    if (URLRepo._instance === null) {
+      URLRepo._instance = new URLRepo()
     }
-    return Object.freeze(StorageManager._instance)
+    return Object.freeze(URLRepo._instance)
   }
-  
+
   // SECURITY: in case of astronomically improbable collision, have a robust way to prevent sequential guesses
   hash(longURL: string, time: string) {
     for (let salt = 0; salt < 10; salt++) {
       const input = `${salt}::${time}::${longURL}`
       const binHash = createHash('sha256').update(input).digest()
-      const base62 = baseX(StorageManager.URLfriendlyEncoding)
+      const base62 = baseX(URLRepo.URLfriendlyEncoding)
       const base62Hash = base62.encode(binHash)
       const hashSlice = base62Hash.slice(0, 8)
 
@@ -78,4 +78,4 @@ class StorageManager {
   }
 }
 
-export { StorageManager }
+export { URLRepo }
