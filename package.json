@@ -3,9 +3,8 @@
   "version": "1.0.0",
   "description": "URL shortening service",
   "main": "index.js",
-  "type": "module",
   "scripts": {
-    "test": "npx tap --node-arg=--import=tsx",
+    "test": "npx tap",
     "dev": "npx nodemon src/server.ts --exec tsx"
   },
   "author": "Iuliu Teodor Radu",

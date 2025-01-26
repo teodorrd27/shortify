@@ -28,3 +28,4 @@ function validateEnv(): EnvType {
 }
 
 export const env = validateEnv() 
+export { validateEnv }
