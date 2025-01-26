@@ -8,6 +8,7 @@ import { env } from './env'
 
 import { fastifySchedule } from '@fastify/schedule'
 import { SimpleIntervalJob, AsyncTask } from 'toad-scheduler'
+import { ShortenedURLEntry } from './types/storage.type'
 
 const cleanupExpiredURLsTask = new AsyncTask('clean up expired URLs', async () => {
   const now = dayjs()
@@ -80,17 +81,20 @@ const buildFastify = () => {
         shortURL: z.string(),
       }),
     }
-  } }, (req, res) => {
+  } }, (req) => {
     const { url } = req.query
     const now = dayjs()
     const safeParam = StorageManager.instance.hash(url, now.toISOString())
-    StorageManager.instance.storage.set(safeParam, {
+    const shortenedURLEntry: ShortenedURLEntry = {
       createdAt: now.toDate(),
       expiresAt: now.add(env.DEFAULT_EXPIRY_DAYS, 'days').toDate(),
       longURL: url,
       shortParam: safeParam,
       clicks: 0,
-    })
+    }
+    StorageManager.instance.storage.set(safeParam, shortenedURLEntry)
+    StorageManager.instance.descOrderedExpiryIndex.push(shortenedURLEntry.expiresAt.toISOString())
+    StorageManager.instance.descOrderedExpiryIndex.sort((a, b) => dayjs(b).diff(dayjs(a)))
 
     return { shortURL: StorageManager.instance.buildShortURL(safeParam) }
   })
@@ -118,17 +122,20 @@ const buildFastify = () => {
         shortURL: z.string(),
       })
     }
-  }}, (req, res) => {
+  }}, (req) => {
     const { url, daysToExpire } = req.body
     const now = dayjs()
     const safeParam = StorageManager.instance.hash(url, now.toISOString())
-    StorageManager.instance.storage.set(safeParam, {
+    const shortenedURLEntry: ShortenedURLEntry = {
       createdAt: now.toDate(),
       expiresAt: now.add(daysToExpire ?? env.DEFAULT_EXPIRY_DAYS, 'days').toDate(),
       longURL: url,
       shortParam: safeParam,
       clicks: 0,
-    })
+    }
+    StorageManager.instance.storage.set(safeParam, shortenedURLEntry)
+    StorageManager.instance.descOrderedExpiryIndex.push(shortenedURLEntry.expiresAt.toISOString())
+    StorageManager.instance.descOrderedExpiryIndex.sort((a, b) => dayjs(b).diff(dayjs(a)))
 
     return { shortURL: StorageManager.instance.buildShortURL(safeParam) }
   })
