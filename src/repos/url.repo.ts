@@ -40,7 +40,9 @@ class URLRepo {
 
   insert(safeShortenedURLEntry: ShortenedURLEntry) {
     const safeParam = safeShortenedURLEntry.shortParam
+    const expiresAt = safeShortenedURLEntry.expiresAt.toISOString()
     this.storage.set(safeParam, safeShortenedURLEntry)
+    this.storage.set(expiresAt, safeShortenedURLEntry)
     this.descOrderedExpiryIndex.push(safeShortenedURLEntry.expiresAt.toISOString())
     this.descOrderedExpiryIndex.sort((a, b) => dayjs(b).diff(dayjs(a)))
   }
@@ -69,12 +71,23 @@ class URLRepo {
   }
 
   deleteLastEntry() {
-    const entry = this.descOrderedExpiryIndex.pop()
-    if (entry) this.storage.delete(entry)
+    const key = this.descOrderedExpiryIndex.pop()
+    if (key) {
+      const entry = this.storage.get(key)
+      if (entry) {
+        this.storage.delete(entry.shortParam)
+        this.storage.delete(entry.expiresAt.toISOString())
+      }
+    }
   }
 
   get size() {
-    return this.storage.size
+    return this.storage.size / 2
+  }
+
+  drop() {
+    this.storage.clear()
+    this.descOrderedExpiryIndex.length = 0
   }
 }
 
