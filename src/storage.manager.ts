@@ -2,15 +2,16 @@ import { env } from './env'
 import { ShortenedURLEntry } from './types/storage.type'
 import { createHash } from 'crypto'
 import baseX from 'base-x'
-import dayjs from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 
 class StorageManager {
   private static _instance: StorageManager | null = null
   private static readonly URLfriendlyEncoding = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-  private storage = new Map<string, ShortenedURLEntry>()
-  private descOrderedExpiryIndex: string[] = []
   
-  private constructor() {}
+  private constructor(
+    private storage = new Map<string, ShortenedURLEntry>(),
+    private descOrderedExpiryIndex: string[] = [],
+  ) {}
 
   // Ensure a single instance of StorageManager
   static get instance(): StorageManager {
@@ -59,6 +60,16 @@ class StorageManager {
   extractShortParam(url: string) {
     const urlObj = new URL(url)
     return urlObj.pathname.slice(1)
+  }
+
+  isLastOrderedEntryExpired(dateTimeNow: Dayjs) {
+    const length = this.descOrderedExpiryIndex.length
+    return length > 0 && dateTimeNow.isAfter(dayjs(this.descOrderedExpiryIndex[length - 1]))
+  }
+
+  deleteLastEntry() {
+    const entry = this.descOrderedExpiryIndex.pop()
+    if (entry) this.storage.delete(entry)
   }
 
   get size() {
