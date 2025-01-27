@@ -1,8 +1,5 @@
 import Fastify from 'fastify'
 import { serializerCompiler, validatorCompiler, ZodTypeProvider } from 'fastify-type-provider-zod'
-import { z } from 'zod'
-
-import { URLRepo } from './repos/url.repo'
 
 import { fastifySchedule } from '@fastify/schedule'
 
@@ -13,10 +10,11 @@ import { DemoURLDecodeHandler, DemoURLEncodeHandler } from './handlers/demo.url.
 import { HealthSchema } from './schemas/health.schema'
 import { URLEncodeSchema, URLFollowSchema } from './schemas/url.schema'
 import { URLEncodeHandler, URLFollowHandler } from './handlers/url.handler'
+import { env } from './env'
 
 const buildFastify = () => {
   const fastify = Fastify({
-    logger: true,
+    logger: env.API_LOGGING,
   })
 
   fastify.setValidatorCompiler(validatorCompiler)
@@ -27,7 +25,6 @@ const buildFastify = () => {
   // SECURITY: custom handler prevents sensitive Fastify information from being exposed
   // TODO: move to separate module
   fastify.setErrorHandler((error, req, res) => {
-    console.log(req.params)
     // TODO: must improve message format
     return res
       .status(error.statusCode || 400)
