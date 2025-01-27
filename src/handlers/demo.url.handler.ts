@@ -35,7 +35,6 @@ const DemoURLDecodeHandler: RouteHandler<{
   const { url } = req.query
   const shortParam = URLRepo.instance.extractShortParam(url)
   const entry = URLRepo.instance.read(shortParam)
-
   if (!entry) {
     res.status(404)
     return {
