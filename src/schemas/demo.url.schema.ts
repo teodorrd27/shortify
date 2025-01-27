@@ -31,7 +31,16 @@ const DemoURLEncodeSchema = {
 const DemoURLDecodeSchema = {
   querystring: z.strictObject({
     url: z.string({
-      required_error: `'url' query is required. Example: ${process.env.DOMAIN}/decode?url=${env.PROTOCOL}://${env.DOMAIN}/HPxdBt3e`,
+      required_error: `'url' query is required. Example: ${env.DOMAIN}/decode?url=${env.PROTOCOL}://${env.DOMAIN}/HPxdBt3e`,
+    }).refine((url) => {
+      // ASSUMPTION: if provided URL does not have a protocol, it is defaulted to HTTPS
+      const isValidURL = validator.isURL(url, {
+        protocols: [env.PROTOCOL],
+        require_port: env.PROTOCOL === 'http', // if running locally, port is required
+        require_tld: env.PROTOCOL === 'https', // if running in prod, tld is required
+        allow_query_components: false
+      })
+      return isValidURL
     }).transform((url) => {
       if (!url.startsWith(`${env.PROTOCOL}://`)) {
         return `${env.PROTOCOL}://${url}`
