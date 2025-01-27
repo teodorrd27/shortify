@@ -1,19 +1,26 @@
 import { test } from 'tap'
 import { buildFastify} from '../src/app'
 
-test('GET /health endpoint returns 200 and ok status in JSON format', async (t) => {
+test('Error handler returns 400 status code when error has no status code', async (t) => {
   t.teardown(() => app.close())
-  t.plan(2)
+  t.plan(3)
   const app = buildFastify()
+
+  // Mock error without statusCode
+  app.get('/test-error', () => {
+    const error = new Error('Test error')
+    throw error
+  })
 
   const res = await app.inject({
     method: 'GET',
-    url: '/health',
+    url: '/test-error'
   }).catch((err) => {
     t.error(err)
   })
   if (!res) return
 
-  t.equal(res?.statusCode, 200)
-  t.equal(res?.body, JSON.stringify({ status: 'ok'}))
+  t.equal(res.statusCode, 400)
+  t.equal(res.json().error, 'Bad Request')
+  t.equal(res.json().message, 'Test error')
 })
