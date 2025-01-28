@@ -6,16 +6,20 @@ import { fastifySchedule } from '@fastify/schedule'
 import { cleanupExpiredURLsJob } from './jobs/cleanupExpiredURLs.job'
 import { healthHandler } from './handlers/health.handler'
 import { DemoURLDecodeSchema, DemoURLEncodeSchema } from './schemas/demo.url.schema'
-import { DemoURLDecodeHandler, DemoURLEncodeHandler } from './handlers/demo.url.handler'
+import { buildDemoURLDecodeHandler, buildDemoURLEncodeHandler } from './handlers/demo.url.handler'
 import { HealthSchema } from './schemas/health.schema'
 import { URLEncodeSchema, URLFollowSchema } from './schemas/url.schema'
-import { URLEncodeHandler, URLFollowHandler } from './handlers/url.handler'
+import { buildURLEncodeHandler, buildURLFollowHandler } from './handlers/url.handler'
 import { env } from './env'
+import { URLRepo } from './repos/url.repo'
+import { URLService } from './services/url.service'
 
 const buildFastify = () => {
   const fastify = Fastify({
     logger: env.API_LOGGING,
   })
+
+  const urlService = new URLService(URLRepo.instance)
 
   fastify.setValidatorCompiler(validatorCompiler)
   fastify.setSerializerCompiler(serializerCompiler)
@@ -37,12 +41,12 @@ const buildFastify = () => {
 
   // PROD Handlers
   fastify.withTypeProvider<ZodTypeProvider>().get('/health', { schema: HealthSchema }, healthHandler)
-  fastify.withTypeProvider<ZodTypeProvider>().post('/encode', { schema: URLEncodeSchema }, URLEncodeHandler)
-  fastify.withTypeProvider<ZodTypeProvider>().get('/:shortParam', { schema: URLFollowSchema }, URLFollowHandler)
+  fastify.withTypeProvider<ZodTypeProvider>().post('/encode', { schema: URLEncodeSchema }, buildURLEncodeHandler(urlService))
+  fastify.withTypeProvider<ZodTypeProvider>().get('/:shortParam', { schema: URLFollowSchema }, buildURLFollowHandler(urlService))
 
   // DEMO Handlers (Try in browser)
-  fastify.withTypeProvider<ZodTypeProvider>().get('/encode', { schema: DemoURLEncodeSchema }, DemoURLEncodeHandler)
-  fastify.withTypeProvider<ZodTypeProvider>().get('/decode', { schema: DemoURLDecodeSchema }, DemoURLDecodeHandler)
+  fastify.withTypeProvider<ZodTypeProvider>().get('/encode', { schema: DemoURLEncodeSchema }, buildDemoURLEncodeHandler(urlService))
+  fastify.withTypeProvider<ZodTypeProvider>().get('/decode', { schema: DemoURLDecodeSchema }, buildDemoURLDecodeHandler(urlService))
 
   fastify.ready().then(() => {
     fastify.scheduler.addSimpleIntervalJob(cleanupExpiredURLsJob)

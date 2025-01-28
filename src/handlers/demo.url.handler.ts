@@ -1,41 +1,27 @@
 import type { RouteHandler } from 'fastify'
 import type { DemoURLDecodeSchema, DemoURLEncodeSchema } from '../schemas/demo.url.schema'
-import type { ShortenedURLEntry } from '../types/storage.type'
-
-import dayjs from 'dayjs'
-import { env } from '../env'
-import { URLRepo } from '../repos/url.repo'
 import { z } from 'zod'
+import type { URLService } from '../services/url.service'
 
-const DemoURLEncodeHandler: RouteHandler<{
+const buildDemoURLEncodeHandler = (urlService: URLService): RouteHandler<{
   Querystring: z.infer<typeof DemoURLEncodeSchema.querystring>
   Reply: z.infer<typeof DemoURLEncodeSchema.response[200]>
-}> = async (req) => {
-  const { url } = req.query
-  const now = dayjs()
-  const safeParam = URLRepo.instance.hash(url, now.toISOString())
-  const shortenedURLEntry: ShortenedURLEntry = {
-    createdAt: now.toDate(),
-    expiresAt: now.add(env.DEFAULT_EXPIRY_DAYS, 'days').toDate(),
-    longURL: url,
-    shortParam: safeParam,
-    clicks: 0,
-  }
-  URLRepo.instance.insert(shortenedURLEntry)
+}> => async (req) => {
+  const { longURL } = req.query
+  const shortURL = urlService.createShortURL(longURL)
 
-  return { shortURL: URLRepo.instance.buildShortURL(safeParam) }
+  return { shortURL }
 }
 
-const DemoURLDecodeHandler: RouteHandler<{
+const buildDemoURLDecodeHandler = (urlService: URLService): RouteHandler<{
   Querystring: z.infer<typeof DemoURLDecodeSchema.querystring>
   Reply:
     | z.infer<typeof DemoURLDecodeSchema.response[200]>
     | z.infer<typeof DemoURLDecodeSchema.response[404]>
-}> = (req, res) => {
-  const { url } = req.query
-  const shortParam = URLRepo.instance.extractShortParam(url)
-  const entry = URLRepo.instance.read(shortParam)
-  if (!entry) {
+}> => (req, res) => {
+  const { shortURL } = req.query
+  const longURL = urlService.getLongURL(shortURL)
+  if (longURL === null) {
     res.status(404)
     return {
       statusCode: 404,
@@ -43,7 +29,7 @@ const DemoURLDecodeHandler: RouteHandler<{
       message: 'Short URL not found',
     }
   }
-  return { longURL: entry.longURL }
+  return { longURL }
 }
 
-export { DemoURLEncodeHandler, DemoURLDecodeHandler }
+export { buildDemoURLEncodeHandler, buildDemoURLDecodeHandler }
