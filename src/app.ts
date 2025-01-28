@@ -1,4 +1,4 @@
-import Fastify from 'fastify'
+import Fastify, { FastifyInstance } from 'fastify'
 import { serializerCompiler, validatorCompiler, ZodTypeProvider } from 'fastify-type-provider-zod'
 
 import { fastifySchedule } from '@fastify/schedule'
@@ -14,8 +14,8 @@ import { env } from './env'
 import { URLRepo } from './repos/url.repo'
 import { URLService } from './services/url.service'
 
-const buildFastify = () => {
-  const fastify = Fastify({
+const buildFastify = (preConfiguredFastifyInstance?: FastifyInstance) => {
+  const fastify = preConfiguredFastifyInstance || Fastify({
     logger: env.API_LOGGING,
   })
 
