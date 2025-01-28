@@ -1,6 +1,7 @@
 import Fastify, { FastifyInstance } from 'fastify'
 import { serializerCompiler, validatorCompiler, ZodTypeProvider } from 'fastify-type-provider-zod'
 
+import { fastifyHelmet } from '@fastify/helmet'
 import { fastifySchedule } from '@fastify/schedule'
 
 import { cleanupExpiredURLsJob } from './jobs/cleanupExpiredURLs.job'
@@ -21,6 +22,7 @@ const buildFastify = (preConfiguredFastifyInstance?: FastifyInstance) => {
   fastify.setValidatorCompiler(validatorCompiler)
   fastify.setSerializerCompiler(serializerCompiler)
 
+  fastify.register(fastifyHelmet)
   fastify.register(fastifySchedule)
 
   // SECURITY: custom handler prevents sensitive Fastify information from being exposed
