@@ -106,6 +106,100 @@ test('URLEncodeHandler', async (t) => {
   })
 })
 
+test('URLDecodeHandler', async (t) => {
+  t.test('successfully decodes an existing short URL', async (t) => {
+    t.teardown(() => app.close())
+    t.plan(2)
+    const app = buildFastify()
+
+    // Create a test URL entry
+    const longURL = 'https://example.com'
+    const now = dayjs()
+    const shortParam = URLRepo.instance.hash(longURL, now.toISOString())
+    URLRepo.instance.insert({
+      longURL,
+      shortParam,
+      createdAt: now.toDate(),
+      expiresAt: now.add(env.DEFAULT_EXPIRY_DAYS, 'days').toDate(),
+      clicks: 0
+    })
+
+    const shortURL = URLRepo.instance.buildShortURL(shortParam)
+    const res = await app.inject({
+      method: 'POST',
+      url: '/decode',
+      payload: { shortURL }
+    })
+
+    t.equal(res.statusCode, 200)
+    t.equal(res.json().longURL, longURL)
+  })
+
+  t.test('returns 404 for non-existent short URL', async (t) => {
+    t.teardown(() => app.close())
+    t.plan(3)
+    const app = buildFastify()
+    
+    const nonExistentURL = `${env.PROTOCOL}://${env.DOMAIN}/nonexistent`
+    const res = await app.inject({
+      method: 'POST',
+      url: '/decode',
+      payload: { shortURL: nonExistentURL }
+    })
+
+    t.equal(res.statusCode, 404)
+    const body = res.json()
+    t.equal(body.error, 'Not Found')
+    t.equal(body.message, 'Short URL not found')
+  })
+
+  t.test('returns 400 for invalid short URL format', async (t) => {
+    t.teardown(() => app.close())
+    t.plan(3)
+    const app = buildFastify()
+    
+    const res = await app.inject({
+      method: 'POST',
+      url: '/decode',
+      payload: { shortURL: 'invalid-url' }
+    })
+
+    t.equal(res.statusCode, 400)
+    const body = res.json()
+    t.equal(body.error, 'Bad Request')
+    t.ok(body.message)
+  })
+
+  t.test('successfully decodes short URL without protocol', async (t) => {
+    t.teardown(() => app.close())
+    t.plan(2)
+    const app = buildFastify()
+
+    // Create a test URL entry
+    const longURL = 'https://example.com'
+    const now = dayjs()
+    const shortParam = URLRepo.instance.hash(longURL, now.toISOString())
+    URLRepo.instance.insert({
+      longURL,
+      shortParam,
+      createdAt: now.toDate(),
+      expiresAt: now.add(env.DEFAULT_EXPIRY_DAYS, 'days').toDate(),
+      clicks: 0
+    })
+
+    // Send request without protocol
+    const shortURL = `${env.DOMAIN}/${shortParam}`
+    const res = await app.inject({
+      method: 'POST',
+      url: '/decode',
+      payload: { shortURL }
+    })
+
+    t.equal(res.statusCode, 200)
+    t.equal(res.json().longURL, longURL)
+  })
+})
+
 test('URLFollowHandler', async (t) => {
   t.test('successfully redirects to long URL', async (t) => {
     t.teardown(() => app.close())

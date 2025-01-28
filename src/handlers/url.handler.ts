@@ -1,5 +1,5 @@
 import { RouteHandler } from 'fastify'
-import { URLEncodeSchema, URLFollowSchema } from '../schemas/url.schema'
+import { URLDecodeSchema, URLEncodeSchema, URLFollowSchema } from '../schemas/url.schema'
 import { z } from 'zod'
 import type { URLService } from '../services/url.service'
 
@@ -11,6 +11,25 @@ const buildURLEncodeHandler = (urlService: URLService): RouteHandler<{
   const shortURL = urlService.createShortURL(longURL, daysToExpire)
 
   return { shortURL }
+}
+
+const buildURLDecodeHandler = (urlService: URLService): RouteHandler<{
+  Body: z.infer<typeof URLDecodeSchema.body>
+  Reply:
+    | z.infer<typeof URLDecodeSchema.response[200]>
+    | z.infer<typeof URLDecodeSchema.response[404]>
+}> => (req, res) => {
+  const { shortURL } = req.body
+  const longURL = urlService.getLongURL(shortURL)
+  if (longURL === null) {
+    res.status(404)
+    return {
+      statusCode: 404,
+      error: 'Not Found',
+      message: 'Short URL not found',
+    }
+  }
+  return { longURL }
 }
 
 const buildURLFollowHandler = (urlService: URLService): RouteHandler<{
@@ -36,4 +55,4 @@ const buildURLFollowHandler = (urlService: URLService): RouteHandler<{
   return
 }
 
-export { buildURLEncodeHandler, buildURLFollowHandler }
+export { buildURLEncodeHandler,buildURLDecodeHandler, buildURLFollowHandler }

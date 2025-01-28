@@ -29,6 +29,40 @@ const URLEncodeSchema = {
   }
 } satisfies ISchema
 
+const URLDecodeSchema = {
+  body: z.strictObject({
+    shortURL: z.string({
+      required_error: `'shortURL' omitted from body.`,
+    }).refine((url) => {
+      // ASSUMPTION: if provided URL does not have a protocol, it is defaulted to HTTPS
+      const isValidURL = validator.isURL(url, {
+        protocols: [env.PROTOCOL],
+        require_port: env.PROTOCOL === 'http', // if running locally, port is required
+        require_tld: env.PROTOCOL === 'https', // if running in prod, tld is required
+        allow_query_components: false
+      })
+      return isValidURL
+    }, {
+      message: `Invalid URL. Hint: Make sure to use a ${env.PROTOCOL}://${env.DOMAIN}/{shortParam} link.`
+    }).transform((url) => {
+      if (!url.startsWith(`${env.PROTOCOL}://`)) {
+        return `${env.PROTOCOL}://${url}`
+      }
+      return url
+    }),
+  }),
+  response: {
+    200: z.object({
+      longURL: z.string(),
+    }),
+    404: z.object({
+      statusCode: z.number(),
+      error: z.string(),
+      message: z.string(),
+    }),
+  }
+} satisfies ISchema
+
 const URLFollowSchema = {
   params: z.strictObject({
     shortParam: z.string().length(8),
@@ -45,4 +79,4 @@ const URLFollowSchema = {
   }
 } satisfies ISchema
 
-export { URLEncodeSchema, URLFollowSchema }
+export { URLEncodeSchema, URLDecodeSchema, URLFollowSchema }

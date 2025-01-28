@@ -8,8 +8,8 @@ import { healthHandler } from './handlers/health.handler'
 import { DemoURLDecodeSchema, DemoURLEncodeSchema } from './schemas/demo.url.schema'
 import { buildDemoURLDecodeHandler, buildDemoURLEncodeHandler } from './handlers/demo.url.handler'
 import { HealthSchema } from './schemas/health.schema'
-import { URLEncodeSchema, URLFollowSchema } from './schemas/url.schema'
-import { buildURLEncodeHandler, buildURLFollowHandler } from './handlers/url.handler'
+import { URLDecodeSchema, URLEncodeSchema, URLFollowSchema } from './schemas/url.schema'
+import { buildURLDecodeHandler, buildURLEncodeHandler, buildURLFollowHandler } from './handlers/url.handler'
 import { env } from './env'
 import { URLRepo } from './repos/url.repo'
 import { URLService } from './services/url.service'
@@ -42,6 +42,7 @@ const buildFastify = () => {
   // PROD Handlers
   fastify.withTypeProvider<ZodTypeProvider>().get('/health', { schema: HealthSchema }, healthHandler)
   fastify.withTypeProvider<ZodTypeProvider>().post('/encode', { schema: URLEncodeSchema }, buildURLEncodeHandler(urlService))
+  fastify.withTypeProvider<ZodTypeProvider>().post('/decode', { schema: URLDecodeSchema }, buildURLDecodeHandler(urlService))
   fastify.withTypeProvider<ZodTypeProvider>().get('/:shortParam', { schema: URLFollowSchema }, buildURLFollowHandler(urlService))
 
   // DEMO Handlers (Try in browser)

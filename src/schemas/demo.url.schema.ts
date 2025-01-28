@@ -41,6 +41,8 @@ const DemoURLDecodeSchema = {
         allow_query_components: false
       })
       return isValidURL
+    }, {
+      message: `Invalid URL. Hint: Make sure to use a ${env.PROTOCOL}://${env.DOMAIN}/{8-character-code} link.`
     }).transform((url) => {
       if (!url.startsWith(`${env.PROTOCOL}://`)) {
         return `${env.PROTOCOL}://${url}`
