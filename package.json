@@ -2,7 +2,7 @@
   "name": "shortify",
   "version": "1.0.0",
   "description": "URL shortening service",
-  "main": "index.js",
+  "main": "src/server.ts",
   "scripts": {
     "test": "API_LOGGING=false npx tap",
     "dev": "npx nodemon src/server.ts --exec tsx"
