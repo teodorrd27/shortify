@@ -1,5 +1,5 @@
 import { test } from 'tap'
-import { buildFastify} from '../src/app'
+import { buildFastify} from '../../src/app'
 
 test('Error handler returns 400 status code when error has no status code', async (t) => {
   t.teardown(() => app.close())

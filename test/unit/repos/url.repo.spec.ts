@@ -1,6 +1,6 @@
 import { test } from 'tap'
-import { URLRepo } from '../../src/repos/url.repo'
-import { env } from '../../src/env'
+import { URLRepo } from '../../../src/repos/url.repo'
+import { env } from '../../../src/env'
 import dayjs from 'dayjs'
 
 test('insert | read: URLRepo underlying storage is modifiable', async (t) => {

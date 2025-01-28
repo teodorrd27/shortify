@@ -1,4 +1,4 @@
-import { buildFastify } from '../../src/app'
+import { buildFastify } from '../../../src/app'
 import { test } from 'tap'
 
 test('GET /health endpoint returns 200 and ok status in JSON format', async (t) => {

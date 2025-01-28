@@ -12,7 +12,7 @@ export class URLService {
     
     const shortenedURLEntry: ShortenedURLEntry = {
       createdAt: now.toDate(),
-      expiresAt: now.add(daysToExpire ?? env.DEFAULT_EXPIRY_DAYS, 'days').toDate(),
+      expiresAt: now.add((daysToExpire ?? env.DEFAULT_EXPIRY_DAYS) * 24, 'hours').toDate(),
       longURL,
       shortParam: safeParam,
       clicks: 0,

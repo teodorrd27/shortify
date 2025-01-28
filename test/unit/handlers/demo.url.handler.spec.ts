@@ -1,7 +1,7 @@
 import { test } from 'tap'
-import { buildFastify } from '../../src/app'
-import { URLRepo } from '../../src/repos/url.repo'
-import { env } from '../../src/env'
+import { buildFastify } from '../../../src/app'
+import { URLRepo } from '../../../src/repos/url.repo'
+import { env } from '../../../src/env'
 import dayjs from 'dayjs'
 
 test('DemoURLEncodeHandler', async (t) => {

@@ -1,6 +1,6 @@
 import { test } from 'tap'
-import { URLRepo } from '../../src/repos/url.repo'
-import { cleanupCallback } from '../../src/jobs/cleanupExpiredURLs.job'
+import { URLRepo } from '../../../src/repos/url.repo'
+import { cleanupCallback } from '../../../src/jobs/cleanupExpiredURLs.job'
 import dayjs from 'dayjs'
 
 test('cleanupCallback: deletes expired URLs', async (t) => {
