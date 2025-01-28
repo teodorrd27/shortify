@@ -10,14 +10,11 @@ import { buildDemoURLDecodeHandler, buildDemoURLEncodeHandler } from './handlers
 import { HealthSchema } from './schemas/health.schema'
 import { URLDecodeSchema, URLEncodeSchema, URLFollowSchema } from './schemas/url.schema'
 import { buildURLDecodeHandler, buildURLEncodeHandler, buildURLFollowHandler } from './handlers/url.handler'
-import { env } from './env'
 import { URLRepo } from './repos/url.repo'
 import { URLService } from './services/url.service'
 
 const buildFastify = (preConfiguredFastifyInstance?: FastifyInstance) => {
-  const fastify = preConfiguredFastifyInstance || Fastify({
-    logger: env.API_LOGGING,
-  })
+  const fastify = preConfiguredFastifyInstance || Fastify()
 
   const urlService = new URLService(URLRepo.instance)
 

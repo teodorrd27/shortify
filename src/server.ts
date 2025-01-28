@@ -4,7 +4,7 @@ import { env } from './env'
 
 (async () => {
   const preConfiguredFastify = Fastify({
-    logger: env.API_LOGGING,
+    logger: true,
   })
   await preConfiguredFastify.register(import('@fastify/rate-limit'), {
     global: true,

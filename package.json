@@ -4,7 +4,7 @@
   "description": "URL shortening service",
   "main": "src/server.ts",
   "scripts": {
-    "test": "API_LOGGING=false npx tap",
+    "test": "npx tap",
     "dev": "npx nodemon src/server.ts --exec tsx"
   },
   "author": "Iuliu Teodor Radu",
