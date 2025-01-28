@@ -2,11 +2,12 @@ import type { ISchema } from '../types/schema.type'
 
 import { z } from 'zod'
 import validator from 'validator'
+import { env } from '../env'
 
 const URLEncodeSchema = {
   body: z.strictObject({
-    url: z.string({
-      required_error: `'url' omitted from body.`,
+    longURL: z.string({
+      required_error: `'longURL' omitted from body.`,
     }).refine((url) => {
       // ASSUMPTION: if provided URL does not have a protocol, it is defaulted to HTTPS
       return validator.isURL(url, { protocols: ['https'] })
@@ -32,7 +33,7 @@ const URLFollowSchema = {
   params: z.strictObject({
     shortParam: z.string().length(8),
   }, {
-    message: `Your URL code must contain exactly 8 characters. Example: ${process.env.DOMAIN}/HPxdBt3e`,
+    message: `Your URL code must contain exactly 8 characters. Example: ${env.DOMAIN}/HPxdBt3e`,
   }),
   response: {
     302: z.void(),

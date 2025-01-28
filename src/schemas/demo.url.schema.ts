@@ -6,8 +6,8 @@ import { env } from '../env'
 
 const DemoURLEncodeSchema = {
   querystring: z.strictObject({
-    url: z.string({
-      required_error: `'url' query is required. Example: ${process.env.DOMAIN}/encode?url=https://example.com`,
+    longURL: z.string({
+      required_error: `'longURL' query is required. Example: ${env.DOMAIN}/encode?longURL=https://example.com`,
     }).refine((url) => {
       // ASSUMPTION: if provided URL does not have a protocol, it is defaulted to HTTPS
       return validator.isURL(url, { protocols: ['https'], allow_query_components: false })
@@ -30,8 +30,8 @@ const DemoURLEncodeSchema = {
 
 const DemoURLDecodeSchema = {
   querystring: z.strictObject({
-    url: z.string({
-      required_error: `'url' query is required. Example: ${env.DOMAIN}/decode?url=${env.PROTOCOL}://${env.DOMAIN}/HPxdBt3e`,
+    shortURL: z.string({
+      required_error: `'shortURL' query is required. Example: ${env.DOMAIN}/decode?shortURL=${env.PROTOCOL}://${env.DOMAIN}/HPxdBt3e`,
     }).refine((url) => {
       // ASSUMPTION: if provided URL does not have a protocol, it is defaulted to HTTPS
       const isValidURL = validator.isURL(url, {

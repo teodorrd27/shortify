@@ -15,7 +15,7 @@ test('DemoURLEncodeHandler', async (t) => {
     const res = await app.inject({
       method: 'GET',
       url: '/encode',
-      query: { url: testURL }
+      query: { longURL: testURL }
     })
 
     t.equal(res.statusCode, 200)
@@ -33,7 +33,7 @@ test('DemoURLEncodeHandler', async (t) => {
     const res = await app.inject({
       method: 'GET',
       url: '/encode',
-      query: { url: testURL }
+      query: { longURL: testURL }
     })
 
     t.equal(res.statusCode, 200)
@@ -55,7 +55,7 @@ test('DemoURLEncodeHandler', async (t) => {
     const res = await app.inject({
       method: 'GET',
       url: '/encode',
-      query: { url: 'not-a-valid-url' }
+      query: { longURL: 'not-a-valid-url' }
     })
 
     t.equal(res.statusCode, 400)
@@ -73,7 +73,7 @@ test('DemoURLEncodeHandler', async (t) => {
       method: 'GET',
       url: '/encode',
       query: {
-        url: 'invalid-url'
+        longURL: 'invalid-url'
       }
     }).catch((err) => {
       t.error(err)
@@ -108,7 +108,7 @@ test('DemoURLDecodeHandler', async (t) => {
     const res = await app.inject({
       method: 'GET',
       url: '/decode',
-      query: { url: shortURL }
+      query: { shortURL: shortURL }
     })
 
     t.equal(res.statusCode, 200)
@@ -124,7 +124,7 @@ test('DemoURLDecodeHandler', async (t) => {
     const res = await app.inject({
       method: 'GET',
       url: '/decode',
-      query: { url: nonExistentURL }
+      query: { shortURL: nonExistentURL }
     })
 
     t.equal(res.statusCode, 404)
@@ -141,7 +141,7 @@ test('DemoURLDecodeHandler', async (t) => {
     const res = await app.inject({
       method: 'GET',
       url: '/decode',
-      query: { url: 'invalid-url' }
+      query: { shortURL: 'invalid-url' }
     })
 
     t.equal(res.statusCode, 400)

@@ -8,15 +8,16 @@ test('insert | read: URLRepo underlying storage is modifiable', async (t) => {
 
   t.plan(2)
   const urlRepo = URLRepo.instance
+  const now = new Date()
   urlRepo.insert({
-    longURL: 'test', shortParam: 'test', createdAt: new Date(), expiresAt: new Date(),
+    longURL: 'test', shortParam: 'test', createdAt: now, expiresAt: now,
     clicks: 0
   })
   const readRepo = URLRepo.instance.read('test')
   t.same(readRepo, {
     clicks: 0,
-    createdAt: new Date(),
-    expiresAt: new Date(),
+    createdAt: now,
+    expiresAt: now,
     longURL: 'test',
     shortParam: 'test'
   })

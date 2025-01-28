@@ -14,7 +14,7 @@ test('URLEncodeHandler', async (t) => {
     const res = await app.inject({
       method: 'POST',
       url: '/encode',
-      payload: { url: testURL }
+      payload: { longURL: testURL }
     })
 
     t.equal(res.statusCode, 200)
@@ -44,7 +44,7 @@ test('URLEncodeHandler', async (t) => {
       method: 'POST',
       url: '/encode',
       payload: { 
-        url: testURL,
+        longURL: testURL,
         daysToExpire: customDays
       }
     })
@@ -74,7 +74,7 @@ test('URLEncodeHandler', async (t) => {
     const res = await app.inject({
       method: 'POST',
       url: '/encode',
-      payload: { url: testURL }
+      payload: { longURL: testURL }
     })
 
     t.equal(res.statusCode, 200)
@@ -96,7 +96,7 @@ test('URLEncodeHandler', async (t) => {
     const res = await app.inject({
       method: 'POST',
       url: '/encode',
-      payload: { url: 'not-a-valid-url' }
+      payload: { longURL: 'not-a-valid-url' }
     })
 
     t.equal(res.statusCode, 400)
