@@ -1,0 +1,368 @@
+{
+	"info": {
+		"_postman_id": "5365cf90-b77b-4b73-b286-b264ce29dfb3",
+		"name": "Shortify",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34686111"
+	},
+	"item": [
+		{
+			"name": "demo-encode",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const { shortURL } = pm.response.json()",
+							"pm.collectionVariables.set(\"demo_short_URL\", shortURL);",
+							"const baseURL = pm.collectionVariables.get('BASE_URL')",
+							"const escapedBaseURL = baseURL.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')",
+							"pm.test('URL matches expected format', () => {",
+							"    const regex = new RegExp(`^${escapedBaseURL}\\/[A-Za-z0-9]{8}$`)",
+							"    pm.expect(shortURL).to.match(regex)",
+							"})",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BASE_URL}}/encode?longURL={{demo_long_URL}}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"encode"
+					],
+					"query": [
+						{
+							"key": "longURL",
+							"value": "{{demo_long_URL}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "demo-decode",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const { longURL } = pm.response.json();",
+							"let actualDemoLongURL = pm.collectionVariables.get('demo_long_URL');",
+							"const baseURL = pm.collectionVariables.get('BASE_URL');",
+							"const escapedBaseURL = baseURL.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&');",
+							"pm.test('URL has the correct https protocol', () => {",
+							"    pm.expect(longURL.startsWith('https://')).to.be.true",
+							"})",
+							"",
+							"if (!actualDemoLongURL.startsWith('https://')) actualDemoLongURL = `https://` + actualDemoLongURL",
+							"",
+							"pm.test('Long URL matches the initial demo long URL', () => {",
+							"    pm.expect(longURL).to.equal(actualDemoLongURL);",
+							"})",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BASE_URL}}/decode?shortURL={{demo_short_URL}}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"decode"
+					],
+					"query": [
+						{
+							"key": "shortURL",
+							"value": "{{demo_short_URL}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "encode",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const { shortURL } = pm.response.json()",
+							"pm.collectionVariables.set(\"short_URL\", shortURL)",
+							"const baseURL = pm.collectionVariables.get('BASE_URL')",
+							"",
+							"const escapedBaseURL = baseURL.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')",
+							"",
+							"pm.test('URL matches expected format', () => {",
+							"    const regex = new RegExp(`^${escapedBaseURL}\\/[A-Za-z0-9]{8}$`)",
+							"    pm.expect(shortURL).to.match(regex)",
+							"})",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"longURL\": \"{{long_URL}}\",\n    \"daysToExpire\": 6\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/encode",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"encode"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "decode",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const { longURL } = pm.response.json();",
+							"let actualLongURL = pm.collectionVariables.get('long_URL')",
+							"const baseURL = pm.collectionVariables.get('BASE_URL')",
+							"const escapedBaseURL = baseURL.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&');",
+							"pm.test('URL has the correct https protocol', () => {",
+							"    pm.expect(longURL.startsWith('https://')).to.be.true",
+							"})",
+							"",
+							"if (!actualLongURL.startsWith('https://')) actualLongURL = `https://` + actualLongURL",
+							"",
+							"pm.test('Long URL matches the initial demo long URL', () => {",
+							"    pm.expect(longURL).to.equal(actualLongURL);",
+							"})",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"shortURL\": \"{{short_URL}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/decode",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"decode"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "follow-redirect",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const shortURL = pm.collectionVariables.get('short_URL')",
+							"const shortParam = shortURL.match(/\\/([^\\/]+)\\/?$/)[1]",
+							"pm.collectionVariables.set('short_param', shortParam)",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const headers = pm.response.headers",
+							"const redirect_target = headers.get('location')",
+							"const longURL = pm.collectionVariables.get('long_URL')",
+							"pm.test('Check that the redirection location is set to long_URL', () => {",
+							"    pm.expect(redirect_target).to.equal(longURL)",
+							"    pm.expect(pm.response.code).to.equal(302)",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"followRedirects": false
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BASE_URL}}/:shortParam",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						":shortParam"
+					],
+					"variable": [
+						{
+							"key": "shortParam",
+							"value": "{{short_param}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "health",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const { status } = pm.response.json()",
+							"pm.test('Check that status is OK', () => {",
+							"    pm.expect(status).to.equal('ok')",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BASE_URL}}/health",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "demo_long_URL",
+			"value": "google.com",
+			"type": "string"
+		},
+		{
+			"key": "demo_short_URL",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "long_URL",
+			"value": "https://www.google.com/search?q=tinyurl&sca_esv=c4b2fb5cd062a005&rlz=1C5CHFA_enJP894JP894&ei=d5GVZ4fmMsWThbIPpeDC6Qs&ved=0ahUKEwjH_arXn5KLAxXFSUEAHSWwML0Q4dUDCBA&uact=5&oq=tinyurl&gs_lp=Egxnd3Mtd2l6LXNlcnAiB3Rpbnl1cmwyExAuGIAEGLEDGNEDGEMYxwEYigUyChAAGIAEGEMYigUyBRAAGIAEMgUQABiABDIFEAAYgAQyBRAAGIAEMgUQABiABDIFEAAYgAQyBRAAGIAEMgUQABiABDIiEC4YgAQYsQMY0QMYQxjHARiKBRiXBRjcBBjeBBjgBNgBAki_HlCpDFiMHXACeAGQAQCYAUCgAYkDqgEBN7gBA8gBAPgBAZgCCaACtQOoAhTCAgoQABiwAxjWBBhHwgINEAAYgAQYsAMYQxiKBcICExAAGIAEGEMYtAIYigUY6gLYAQHCAhMQLhiABBhDGLQCGIoFGOoC2AEBwgIUEAAYgAQY4wQYtAIY6QQY6gLYAQHCAhAQLhgDGLQCGOoCGI8B2AECwgIQEAAYAxi0AhjqAhiPAdgBAsICEBAAGIAEGLEDGEMYgwEYigXCAg4QLhiABBixAxjRAxjHAcICERAuGIAEGLEDGIMBGNQCGIoFwgIOEC4YgAQYsQMYgwEYigXCAgsQABiABBixAxiDAcICERAuGIAEGLEDGNEDGIMBGMcBwgIREC4YgAQYsQMY0QMYxwEYigXCAg0QABiABBixAxhDGIoFwgIQEC4YgAQY0QMYQxjHARiKBcICCxAuGIAEGLEDGIMBwgINEC4YgAQYsQMYQxiKBcICChAuGIAEGEMYigXCAhAQLhiABBixAxhDGNQCGIoFwgINEAAYgAQYQxjJAxiKBcICCxAAGIAEGJIDGIoFmAMG8QWPranDJ_Ia54gGAZAGCroGBAgBGAe6BgYIAhABGAqSBwE5oAfJVQ&sclient=gws-wiz-serp",
+			"type": "string"
+		},
+		{
+			"key": "short_URL",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "BASE_URL",
+			"value": "http://localhost:3000",
+			"type": "string"
+		},
+		{
+			"key": "short_param",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

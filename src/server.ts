@@ -8,7 +8,7 @@ import { env } from './env'
   })
   await preConfiguredFastify.register(import('@fastify/rate-limit'), {
     global: true,
-    max: 1,
+    max: 1000,
     timeWindow: 1000,
   })
 

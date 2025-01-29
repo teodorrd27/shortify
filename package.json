@@ -5,6 +5,7 @@
   "main": "src/server.ts",
   "scripts": {
     "test": "npx tap",
+    "test-api": "npx concurrently --raw --kill-others --success first \"npx wait-on tcp:3000 && npx newman run test/api/Shortify.postman_collection.json\" \"npm run dev\"",
     "dev": "npx nodemon src/server.ts --exec tsx"
   },
   "author": "Iuliu Teodor Radu",
@@ -12,10 +13,13 @@
   "devDependencies": {
     "@types/node": "^22.10.9",
     "@types/validator": "^13.12.2",
+    "concurrently": "^9.1.2",
+    "newman": "6.2.0",
     "nodemon": "^3.1.9",
     "tap": "^21.0.1",
     "tsx": "^4.19.2",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "wait-on": "^8.0.2"
   },
   "dependencies": {
     "@fastify/helmet": "^13.0.1",
