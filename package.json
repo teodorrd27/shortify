@@ -6,7 +6,22 @@
   "scripts": {
     "test": "npx tap",
     "test-api": "npx concurrently --raw --kill-others --success first \"npx wait-on tcp:3000 && npx newman run test/api/Shortify.postman_collection.json\" \"npm run dev\"",
-    "dev": "npx nodemon src/server.ts --exec tsx"
+    "dev": "npx nodemon src/server.ts --exec tsx",
+    
+    "build": "npx tsc",
+    "dev-js": "npx tsc && node dist/server.js",
+
+    "build:local": "docker build -t shortify .",
+    "exec-local:local": "docker run --env-file .env -p 3000:3000 shortify",
+
+    "build:prod": "docker build -t ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/shortify:latest .",
+    "exec-local:prod": "docker run --env-file .env -p 3000:3000 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/shortify:latest",
+
+    "auth:prod": "aws ecr get-login-password --profile ${AWS_PROFILE} --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com",
+    "push:prod": "docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/shortify:latest",
+    "deploy-service-update:prod": "aws --profile ${AWS_PROFILE} ecs update-service --cluster ${AWS_CLUSTER} --service ${AWS_SERVICE} --force-new-deployment --region ${AWS_REGION}",
+
+    "deploy:prod": "npm run auth:prod && npm run build:prod && npm run push:prod && npm run deploy-service-update:prod"
   },
   "author": "Iuliu Teodor Radu",
   "license": "MIT",
