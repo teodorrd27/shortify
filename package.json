@@ -14,6 +14,7 @@
     "build:local": "docker build -t shortify .",
     "exec-local:local": "docker run --env-file .env -p 3000:3000 shortify",
 
+    "load-aws-credentials": "./.load_aws.sh",
     "build:prod": "docker build -t ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/shortify:latest .",
     "exec-local:prod": "docker run --env-file .env -p 3000:3000 ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/shortify:latest",
 
@@ -21,7 +22,7 @@
     "push:prod": "docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/shortify:latest",
     "deploy-service-update:prod": "aws --profile ${AWS_PROFILE} ecs update-service --cluster ${AWS_CLUSTER} --service ${AWS_SERVICE} --force-new-deployment --region ${AWS_REGION}",
 
-    "deploy:prod": "npm run auth:prod && npm run build:prod && npm run push:prod && npm run deploy-service-update:prod"
+    "deploy:prod": "./.load_aws.sh && npm run auth:prod && npm run build:prod && npm run push:prod && npm run deploy-service-update:prod"
   },
   "author": "Iuliu Teodor Radu",
   "license": "MIT",

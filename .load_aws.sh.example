@@ -1,0 +1,9 @@
+# The purpose of this script is to populate easy-to-remember variables for AWS
+# credentials and other settings.
+# rename this file to .load_aws.sh and fill in the variables before running it.
+
+export AWS_PROFILE= # default
+export AWS_REGION= # eu-west-1
+export AWS_ACCOUNT_ID= # 123456789012
+export AWS_CLUSTER= # cluster-name
+export AWS_SERVICE= # service-name
