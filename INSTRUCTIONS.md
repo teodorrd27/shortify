@@ -1,14 +1,14 @@
 # Shortify
 Read about the design decisions at the end. POST requests are also supported for extra functionality.
 
-## Live Demo (GET endpoints for browser address bar support)
-**Redirect**: https://shortify.teoradu.com/Wcu0Z346
+## Live Demo (GET address bar support)
+**Encode (Click 👉)**: https://shortify.teoradu.com/encode?longURL=https://www.finn.com/de-DE/pdpb/toyota-aygox-11454-mysticschwarzmica
 
-**Encode**: https://shortify.teoradu.com/encode?longURL=https://www.finn.com/de-DE/pdpb/toyota-aygox-11454-mysticschwarzmica
+**Follow (Copy / Replace {shortParam} 👉)**: https://shortify.teoradu.com/{shortParam}
 
-**Decode**: https://shortify.teoradu.com/decode?shortURL=https://shortify.teoradu.com/Wcu0Z346
+**Decode (Copy / Replace {shortParam} 👉)**: https://shortify.teoradu.com/decode?shortURL=https://shortify.teoradu.com/{shortParam}
 
-## The code - Just get it to run
+## Run the code
 ### Local Development Setup
 
 - Duplicate `.env.example` and rename it to `.env`. This will work as-is.
