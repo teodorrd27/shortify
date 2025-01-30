@@ -26,9 +26,7 @@ const buildFastify = (preConfiguredFastifyInstance?: FastifyInstance) => {
   fastify.register(fastifySchedule)
 
   // SECURITY: custom handler prevents sensitive Fastify information from being exposed
-  // TODO: move to separate module
-  fastify.setErrorHandler((error, req, res) => {
-    // TODO: must improve message format
+  fastify.setErrorHandler((error, _req, res) => {
     return res
       .status(error.statusCode || 400)
       .send({

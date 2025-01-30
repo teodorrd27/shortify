@@ -11,8 +11,8 @@
     "build": "npx tsc",
     "dev-js": "npx tsc && node dist/server.js",
 
-    "build:local": "docker build -t shortify .",
-    "exec-local:local": "docker run --env-file .env -p 3000:3000 shortify",
+    "build-docker:dev": "docker build -t shortify .",
+    "exec-docker:dev": "docker run --env-file .env -p 3000:3000 shortify",
 
     "load-aws-credentials": "./.load_aws.sh",
     "build:prod": "docker build -t ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/shortify:latest .",

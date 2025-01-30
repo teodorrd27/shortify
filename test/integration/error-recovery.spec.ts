@@ -1,7 +1,6 @@
 import { test } from 'tap'
 import { buildFastify } from '../../src/app'
 import { URLRepo } from '../../src/repos/url.repo'
-import { URLService } from '../../src/services/url.service'
 
 test('system recovers from errors and maintains data integrity', async (t) => {
   t.plan(9)
